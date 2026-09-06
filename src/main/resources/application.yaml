@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: duckdb-batch-comparison
+
+  datasource:
+    url: "jdbc:h2:mem:batchmeta;DB_CLOSE_DELAY=-1"
+    driver-class-name: org.h2.Driver
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+      name: batchDuckdbJob
+
+logging:
+  level:
+    org.springframework.batch: WARN
+
+app:
+  delimiter: ";"
+  feed: "feed2.csv"
+  duckdb:
+    url: "jdbc:duckdb:"
+  partitioned:
+    work-dir: "./batch-partitioned"
+    grid-size: 8
+    chunk-size: 10000
