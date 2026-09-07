@@ -58,6 +58,13 @@ Uses DuckDbTransformTasklet to apply SQL-style transformations over CSV data and
   - FilePartitioner + partition step processes chunks in parallel/partitioned manner.
   - MergePartitionOutputsTasklet combines partition outputs into a final file.
 
+## Build & Run
+
+- `mvnw.cmd clean package`
+- `mvnw.cmd spring-boot:run`
+
+Then access swagger UI at: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+
 ## Triggering Jobs / API
 A controller exists at **controller/FeedController.java**, which indicates the app exposes HTTP endpoints to trigger or manage feed processing.
 After starting the app, check available endpoints in that controller and call them using your preferred HTTP client (browser, curl, Postman, etc.).
