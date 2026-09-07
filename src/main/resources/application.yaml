@@ -17,8 +17,8 @@ logging:
     org.springframework.batch: WARN
 
 app:
-  delimiter: ";"
-  feed: "feed2.csv"
+  delimiter: ","
+  feed: "feed.csv"
   duckdb:
     url: "jdbc:duckdb:"
   partitioned:
