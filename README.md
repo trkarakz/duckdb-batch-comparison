@@ -89,3 +89,49 @@ Batch job definitions are in:
  - config/BatchConfig.java
  - config/BatchDuckDbConfig.java
  - config/BatchPartitionedJavaConfig.java
+
+## Problem Being Solved
+
+Many teams process large CSV feeds with **Spring Batch** using Java-based readers/processors/writers.  
+This works well, but as data volume grows, teams often ask:
+
+- Can SQL-based engines like **DuckDB** perform the same transformations faster or more simply?
+- When should we keep logic in Spring Batch processors vs move transformation logic into SQL?
+- Does **partitioned processing** improve throughput enough to justify added complexity?
+
+This project exists to compare these approaches on the same type of input/output workflow.
+
+### Core Problem Statement
+
+Given the same feed data and expected CSV output, determine the trade-offs between:
+
+1. **Standard Spring Batch transformation**
+2. **DuckDB SQL transformation**
+3. **Partitioned Spring Batch processing**
+
+The comparison focuses on:
+
+- implementation complexity
+- maintainability of transformation logic
+- execution performance and scalability
+- operational behavior (splitting, parallelism, merging outputs)
+
+### Why This Matters
+
+In real production pipelines, batch jobs must be:
+
+- fast enough for SLA windows
+- easy to modify when business rules change
+- reliable when input volume spikes
+
+Choosing the wrong approach can lead to slow jobs, hard-to-maintain code, or brittle operations.
+
+### What “Solved” Means in This Repo
+
+The project provides a practical baseline to evaluate:
+
+- how each approach is configured and executed
+- what output artifacts each flow produces
+- how easy it is to reason about and evolve each pipeline
+
+It is intended as a **comparison playground** for architectural decisions, not just a single implementation.
