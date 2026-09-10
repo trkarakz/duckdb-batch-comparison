@@ -46,10 +46,10 @@ class BatchConfig {
 
     @Bean
     @JobScope
-    protected Step processTempFile(CsvReader csvReader,
-                                   CsvToFeedRowProcessor csvToFeedRowProcessor,
-                                   ItemWriter<FeedRow> outputFileWriter,
-                                   JobRepository jobRepository) {
+    protected Step processFile(CsvReader csvReader,
+                               CsvToFeedRowProcessor csvToFeedRowProcessor,
+                               ItemWriter<FeedRow> outputFileWriter,
+                               JobRepository jobRepository) {
         return new StepBuilder("processFeed", jobRepository)
                 .<Map<String, String>, FeedRow>chunk(chunkSize)
                 .faultTolerant()
@@ -77,9 +77,9 @@ class BatchConfig {
     }
 
     @Bean
-    Job batchJavaJob(JobRepository jobRepository, Step processTempFile) {
+    Job batchJavaJob(JobRepository jobRepository, Step processFile) {
         return new JobBuilder("batchJavaJob", jobRepository)
-                .start(processTempFile)
+                .start(processFile)
                 .build();
     }
 }
