@@ -1,0 +1,51 @@
+@startuml
+title Partitioned Config - Components and Responsibilities
+left to right direction
+skinparam componentStyle rectangle
+
+package "Orchestration" {
+  [FeedController]
+  [FeedService]
+}
+
+package "Batch Configuration" {
+  [BatchPartitionedJavaConfig]
+}
+
+package "Tasklets" {
+  [SplitFeedTasklet]
+  [MergePartitionOutputsTasklet]
+}
+
+package "Partitioning" {
+  [FilePartitioner]
+}
+
+package "Worker Step (Chunk)" {
+  [PartitionCsvReader]
+  [CsvToFeedRowProcessor]
+  [FeedRow]
+  [FeedRowToCsvExtractor]
+  [CsvLineAggregator]
+}
+
+database "Files" as Files
+
+[FeedController] --> [FeedService]
+[FeedService] --> [BatchPartitionedJavaConfig]
+
+[BatchPartitionedJavaConfig] --> [SplitFeedTasklet]
+[BatchPartitionedJavaConfig] --> [FilePartitioner]
+[BatchPartitionedJavaConfig] --> [MergePartitionOutputsTasklet]
+
+[FilePartitioner] --> [PartitionCsvReader]
+[PartitionCsvReader] --> [CsvToFeedRowProcessor]
+[CsvToFeedRowProcessor] --> [FeedRow]
+[FeedRow] --> [FeedRowToCsvExtractor]
+[FeedRow] --> [CsvLineAggregator]
+
+[SplitFeedTasklet] --> Files : writes part-*.csv
+[FeedRowToCsvExtractor] --> Files : writes out-*.csv
+[CsvLineAggregator] --> Files : formats csv lines
+[MergePartitionOutputsTasklet] --> Files : reads out-*.csv\nwrites output-partitioned.csv
+@enduml

@@ -1,0 +1,50 @@
+@startuml
+title Partitioned Batch Flow (Overall Process)
+
+start
+
+:Trigger job
+(FeedController / FeedService);
+
+:Build and run job
+(BatchPartitionedJavaConfig);
+
+:Step 1 - SplitFeedTasklet;
+note right
+Input:
+src/main/resources/feed.csv
+Output:
+batch-partitioned/input/part-0..7.csv
+end note
+
+:Step 2 - Partitioned processing;
+:FilePartitioner creates execution contexts
+for each part file;
+
+fork
+  :Worker p0;
+  :PartitionCsvReader;
+  :CsvToFeedRowProcessor;
+  :Write out-0.csv
+  (CsvLineAggregator / FeedRowToCsvExtractor);
+fork again
+  :Worker p1;
+  :PartitionCsvReader;
+  :CsvToFeedRowProcessor;
+  :Write out-1.csv
+  (CsvLineAggregator / FeedRowToCsvExtractor);
+fork again
+  :Worker p2..p7;
+  :Same reader -> processor -> writer flow;
+end fork
+
+:Step 3 - MergePartitionOutputsTasklet;
+note right
+Input:
+batch-partitioned/output/out-0..7.csv
+Output:
+output-partitioned.csv
+end note
+
+stop
+@enduml
