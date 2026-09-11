@@ -32,6 +32,7 @@ public class DuckDbTransformTasklet implements Tasklet {
         var feedPath = feedResource.getFilePath().toAbsolutePath();
         var output = "./duckDbOutput.csv";
         var sql = """
+                PRAGMA threads=8;
                 COPY (
                     WITH src AS (
                         SELECT *
@@ -64,15 +65,15 @@ public class DuckDbTransformTasklet implements Tasklet {
         try (Connection conn = DriverManager.getConnection(duckdbUrl);
              Statement st = conn.createStatement()) {
 
-            long threads = queryLong(st, "SELECT current_setting('threads')");
-            long rows = queryLong(st, "SELECT count(*) FROM read_csv('" + feedPath + "', header = true)");
-
             long start = System.nanoTime();
             st.execute(sql);
             double seconds = (System.nanoTime() - start) / 1e9;
 
             long outputRows = queryLong(st,
                     "SELECT count(*) FROM read_csv('" + output + "', header = true)");
+
+            long threads = queryLong(st, "SELECT current_setting('threads')");
+            long rows = queryLong(st, "SELECT count(*) FROM read_csv('" + feedPath + "', header = true)");
 
             log.info("DuckDB transform: {} input rows -> {} output rows in {} s on {} threads",
                     rows, outputRows, String.format(Locale.US, "%.2f", seconds), threads);
